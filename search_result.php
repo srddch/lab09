@@ -14,15 +14,43 @@
     $conn = @mysqli_connect($host, $user, $pwd, $sql_db);
 
     if ($conn) {
-        if (isset($_GET['model'])) {
+        if (isset($_GET['model']) && trim($_GET['model']) !== "") {
             $model = mysqli_real_escape_string(
                 $conn,
-                $_GET['model']
+                trim($_GET['model'])
             );
 
-            echo "<p>Search model: "
-                . htmlspecialchars($_GET['model'], ENT_QUOTES, 'UTF-8')
-                . "</p>";
+            $sql = "SELECT * FROM cars WHERE model = '$model'";
+            $result = mysqli_query($conn, $sql);
+
+            if ($result) {
+                if (mysqli_num_rows($result) > 0) {
+                    echo "<table>";
+                    echo "<tr>";
+                    echo "<th>ID</th>";
+                    echo "<th>Make</th>";
+                    echo "<th>Model</th>";
+                    echo "<th>Price</th>";
+                    echo "<th>Year</th>";
+                    echo "</tr>";
+
+                    while ($row = mysqli_fetch_assoc($result)) {
+                        echo "<tr>";
+                        echo "<td>" . $row['car_id'] . "</td>";
+                        echo "<td>" . $row['make'] . "</td>";
+                        echo "<td>" . $row['model'] . "</td>";
+                        echo "<td>" . $row['price'] . "</td>";
+                        echo "<td>" . $row['yom'] . "</td>";
+                        echo "</tr>";
+                    }
+
+                    echo "</table>";
+                } else {
+                    echo "<p>🚫 No matching cars found.</p>";
+                }
+            } else {
+                echo "<p>Unable to run the query.</p>";
+            }
         } else {
             echo "<p>Please enter a model to search.</p>";
         }
